@@ -24,13 +24,9 @@ try{
 
     console.log("triggered....");
 
-    // comments.on('item', (item) => {
-    //     console.log(item);
-    // });
-
     stream.on("item", comment => {
         console.log("reached");
-        console.log(comment);
+        console.log(comment.body);
         if(comment.created_utc < BOT_START) return;
         if(!canSummon(comment.body)) return;
         comment.reply("reply from bot!");
