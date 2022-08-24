@@ -22,17 +22,17 @@ try{
 
     const stream = new CommentStream(r, { subreddit: "mytestingspacewpad", results: 1 });
 
-    console.log("triggered....");
-
     stream.on("item", comment => {
-        console.log("reached");
-        console.log(comment.body);
         if(comment.created_utc < BOT_START) return;
         if(!canSummon(comment.body)) return;
         comment.reply("reply from bot!");
+
+        if (canSummon(comment.body)){
+            
+        }
 });
 }
 
 catch (ex){
-    console.log(ex);
+    console.error(ex);
 }
