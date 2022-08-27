@@ -23,14 +23,18 @@ try{
     const stream = new CommentStream(r, { subreddit: "mytestingspacewpad", results: 1 });
 
     stream.on("item", comment => {
-        if(comment.created_utc < BOT_START) return;
-        if(!canSummon(comment.body)) return;
-        comment.reply("reply from bot!");
-
-        if (canSummon(comment.body)){
-            
+        if(!comment.created_utc < BOT_START && canSummon(comment.body))
+        {
+            response = getCommentData(comment.body);
+            console.log(response);
+            comment.reply(response);
         }
-});
+        });
+
+
+    const getCommentData = (comment) => {
+        return comment.replace("u/wattpadbot", "");
+    };
 }
 
 catch (ex){
