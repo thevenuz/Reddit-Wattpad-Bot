@@ -29,7 +29,7 @@ try{
 
             responseData.push(jsonData);
         }
-
+        return responseData;
     }   
 
     module.exports = getStoryLink;
