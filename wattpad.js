@@ -21,15 +21,29 @@ try{
         for (const value of values)
         {
             const storyURL= $(value).children('a').attr('href');
-            const title= $(value).children('.story-card').children('.story-card-data').children('.story-info').children('.title').text();
-            const jsonData = {
-                "title": title,
-                "url" : domain + storyURL
-            };
+            const storyInfo = $(value).children('.story-card').children('.story-card-data').children('.story-info');
+            const storyTitle= $(storyInfo).children('.title').text();
+            const storyStatus = $(storyInfo).children('.icon-bar').children('.completed').children('.tag-item').text();
+            const storyStats = $(storyInfo).children('.new-story-stats').children();
+            const stats = {};
 
-            responseData.push(jsonData);
+            for (const stat of storyStats){
+                const statType = $(stat).children('.stats-label').children('.stats-label__text').text().toLowerCase();//children('.stats-label__text').text();
+                const statValue = $(stat).children('.icon-container').children('.tool-tip').children('.stats-value').text().toLowerCase();
+                stats[statType] = statValue;
+            }
+            const jsonData = {
+                "title": storyTitle,
+                "url" : domain + storyURL,
+                "status" : storyStatus,
+                "stats" : stats
+            };
+            console.log(jsonData)
+            return jsonData;
+
+            // responseData.push(jsonData);
         }
-        return responseData;
+        // return responseData;
     }   
 
     module.exports = getStoryLink;
