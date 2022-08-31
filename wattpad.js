@@ -6,7 +6,7 @@ try{
     const searchPrefix = "https://www.wattpad.com/search/";
     const domain = "https://www.wattpad.com";
     
-    const getStoryLink= async (storyTitle) => {
+    const getStoryData= async (storyTitle) => {
         const searchLink = searchPrefix + storyTitle;
         const responseData=[];
 
@@ -44,9 +44,53 @@ try{
             // responseData.push(jsonData);
         }
         // return responseData;
-    }   
+    };  
 
-    module.exports = getStoryLink;
+    const getAuthorData = async (authorName) => {
+        const authorSearchLink = searchPrefix + authorName;
+
+        const authorSearchResult = await axios.get(authorSearchLink, {
+            headers: headers
+        });
+        const authorHtmlData= authorSearchResult.data;
+        const $ = cheerio.load(authorHtmlData);
+
+        const authorsSection = $('#section-results-people').find('#results-people').find('#results-people-region').find('.feed-item-new.panel').children('.component-wrapper');
+
+        const authorsList = $(authorsSection).children('.list-group').children('.list-group-item');
+
+        for (const author of authorsList)
+        {
+            const authorProfile = $(author).children('.profile-card');
+            const authorProfileURL = $(authorProfile).children('a').attr('href');
+            const authorName = $(authorProfile).children('.profile-card-data').children('.card-content').children('.name-and-badges').children('h5').text();
+            const authorStats = $(authorProfile).children('.profile-card-data').children('.card-content').children('.card-meta').children();
+
+            const authorStatsData = {};
+
+            for (const stat of authorStats)
+            {
+                const authorStatType = $(stat).text().split(" ")[1].toLowerCase();
+                const authorStatValue = $(stat).children().text();
+
+                authorStatsData[authorStatType] = authorStatValue;
+            }
+
+            const authorResponseData = {
+                "name" : authorName,
+                "url" : domain + authorProfileURL,
+                "stats" : authorStatsData
+            };
+
+            return authorResponseData;
+        }
+
+    };
+
+    module.exports = {
+        getStoryData,
+        getAuthorData
+    };
 }
 
 catch (ex){
