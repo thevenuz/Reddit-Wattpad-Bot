@@ -5,8 +5,10 @@ const Snoowrap = require("snoowrap");
 const {CommentStream} = require("snoostorm");
 
 const wattpad = require("./wattpad.js");
+const logger = require("./logger.js");
 
 const BOT_START = Date.now() / 1000;
+
 
 try{
         const r = new Snoowrap({
@@ -60,18 +62,18 @@ try{
             return authorNames;
         };
     
-        const getCommentData = (comment) => {
-            const re= /{([\w-]+( [\w]+)*)[ ]?}/gm;
-            comment = comment.replace("u/wattpadbot", "");
-            console.log(comment);
-            const matches = comment.matchAll(re);
-            const storyTitles= [];
+        // const getCommentData = (comment) => {
+        //     const re= /{([\w-]+( [\w]+)*)[ ]?}/gm;
+        //     comment = comment.replace("u/wattpadbot", "");
+        //     console.log(comment);
+        //     const matches = comment.matchAll(re);
+        //     const storyTitles= [];
 
-            for (const match of matches) {
-                storyTitles.push(match[1])
-            }
-            return storyTitles;
-        };
+        //     for (const match of matches) {
+        //         storyTitles.push(match[1])
+        //     }
+        //     return storyTitles;
+        // };
 
         const buildCommentReply = async (storyTitles, authorNames) => {
             const resData=[];
