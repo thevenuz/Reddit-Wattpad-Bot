@@ -1,5 +1,6 @@
 const axios= require("axios");
 const cheerio = require("cheerio");
+const logger = require("./logger");
 
 try{    
     const headers= {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36'};
@@ -7,6 +8,9 @@ try{
     const domain = "https://www.wattpad.com";
     
     const getStoryData= async (storyTitle) => {
+
+        logger.debug(`wattpad.getStoryData() called for storyTitle: ${storyTitle}`);
+
         const searchLink = searchPrefix + storyTitle;
         const responseData=[];
 
@@ -15,7 +19,6 @@ try{
         });
         const htmldata= res.data;
         const $ = cheerio.load(htmldata);
-        console.log("get story called");
         const values = $('.story-card-container .list-group-item');
 
         for (const value of values)
@@ -38,7 +41,9 @@ try{
                 "status" : storyStatus,
                 "stats" : stats
             };
-            console.log(jsonData)
+
+            logger.debug(`response json data for storyTitle: ${storyTitle} - response json ${jsonData}`);
+
             return jsonData;
 
             // responseData.push(jsonData);
@@ -47,6 +52,9 @@ try{
     };  
 
     const getAuthorData = async (authorName) => {
+
+        logger.debug(`wattpad.getAuthorData() called for authorName: ${authorName}`);
+
         const authorSearchLink = searchPrefix + authorName;
 
         const authorSearchResult = await axios.get(authorSearchLink, {
@@ -82,6 +90,8 @@ try{
                 "stats" : authorStatsData
             };
 
+            logger.debug(`author response data for authorname: ${authorName} - response json ${authorResponseData}`);
+
             return authorResponseData;
         }
 
@@ -94,7 +104,8 @@ try{
 }
 
 catch (ex){
-    console.log(ex);
+    logger.error(`Exception occured in wattpad.js - Exception: ${ex}`);
+    throw new Error(ex);
 }
 
 
