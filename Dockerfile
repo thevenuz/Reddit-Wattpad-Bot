@@ -1,6 +1,8 @@
 FROM node:16
 
-WORKDIR /usr/src/app
+VOLUME ["/src"]
+
+WORKDIR /src
 
 COPY package*.json ./
 

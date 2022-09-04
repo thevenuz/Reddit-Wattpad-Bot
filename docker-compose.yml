@@ -2,4 +2,6 @@ version: "3.8"
 services:
   redditbot:
     build: ./
+    volumes: 
+      - ./:/src
     
