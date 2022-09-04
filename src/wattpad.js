@@ -78,7 +78,7 @@ try{
 
             for (const stat of authorStats)
             {
-                const authorStatType = $(stat).text().split(" ")[1].toLowerCase();
+                const authorStatType = $(stat).text().split(" ")[1].toLowerCase().replace("story", "stories");
                 const authorStatValue = $(stat).children().text();
 
                 authorStatsData[authorStatType] = authorStatValue;
