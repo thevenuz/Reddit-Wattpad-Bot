@@ -38,7 +38,12 @@ try{
 
                 logger.info(`Sending reply for comment: ${comment.body}, Reply: ${reply}`);
 
-                comment.reply(reply);
+                if (reply){
+                    comment.reply(reply);
+                }
+                else{
+                    logger.error(`No response found for comment : ${comment.body}`);
+                }
             }
             });
 
@@ -83,23 +88,30 @@ try{
             for (const title of storyTitles){
                 const res= await wattpad.getStoryData(title);
                 // resData.push(res); 
-                replyString =replyString + `**${res["title"]}** - [link](${res["url"]})\n\n^status: ^${res["status"]} ^| ^Reads: ^${res["stats"]["reads"]} ^| ^Votes: ^${res["stats"]["votes"]} ^| ^Chapters: ^${res["stats"]["parts"]}\n\n\n\n`;
+                if(res){
+                    replyString =replyString + `**${res["title"]}** - [\[link]\](${res["url"]})\n\n**^(status: ${res["status"]} | Reads: ${res["stats"]["reads"]} | Votes: ${res["stats"]["votes"]} | Chapters: ${res["stats"]["parts"]})**\n\n\n\n`;
+                }
             }
 
             for (const author of authorNames)
             {
                 const authorResult= await wattpad.getAuthorData(author);
 
-                replyString =replyString + `**${authorResult["name"]}** - [link](${authorResult["url"]})\n\n^Stories: ^${authorResult["stats"]["stories"]} ^| ^Followers: ^${authorResult["stats"]["followers"]}\n\n\n\n`;
+                if (authorResult){
+                    replyString =replyString + `**${authorResult["name"]}** - [\[link]\](${authorResult["url"]})\n\n**^(Stories: ${authorResult["stats"]["stories"]} | Followers: ${authorResult["stats"]["followers"]})**\n\n\n\n`;
+                }
+            }
+            
+            if (replyString){
+                replyString = addFooter(replyString);
             }
 
-            replyString = addFooter(replyString);
             return replyString;
         };
 
         const addFooter = (reply) => {
-            reply = reply + "\n\n___\n\n";
-            const footer = "^commands: ^{story}, ^<author>";
+            reply = reply + "\n\n\n\n___\n\n";
+            const footer = "**^(commands: {story}, <author> |)**[**^(Feedback)**](https://www.reddit.com/message/compose/?to=wattpadbot)";
             reply = reply + footer;
 
             return reply;
