@@ -24,7 +24,7 @@ try{
             return msg && msg.toLowerCase().includes('u/wattpadbot');
         };
     
-        const stream = new CommentStream(r, { subreddit: "mytestingspacewpad", results: 1 });
+        const stream = new CommentStream(r, { subreddit: "all", results: 3 });
     
         stream.on("item", async (comment) => {
             if(comment.created_utc > BOT_START && canSummon(comment.body))
