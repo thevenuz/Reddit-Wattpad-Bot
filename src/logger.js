@@ -14,7 +14,7 @@ try{
                 filename: path.join(__dirname, '../logs/log-%DATE%.log.txt'),
                 datePattern: 'YYYY-MM-DD-HH',
                 zippedArchive: true,
-                maxSize: '200kb',
+                maxSize: '20m',
                 maxFiles: '14d'
             })
         ]

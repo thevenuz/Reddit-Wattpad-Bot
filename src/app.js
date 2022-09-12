@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const Snoowrap = require("snoowrap");
 
-const {CommentStream} = require("snoostorm");
+const {CommentStream, InboxStream} = require("snoostorm");
 
 const wattpad = require("./wattpad.js");
 const logger = require("./logger.js");
@@ -11,9 +11,10 @@ const BOT_START = Date.now() / 1000;
 
 
 try{
+        console.log("app started....");
         logger.debug("app started....");
         const r = new Snoowrap({
-            userAgent: 'reddit-wattpad-bot-test',
+            userAgent: 'reddit-wattpad-bot',
             clientId: process.env.CLIENT_ID,
             clientSecret: process.env.CLIENT_SECRET,
             username: process.env.REDDIT_USER,
@@ -23,29 +24,64 @@ try{
         const canSummon = (msg) => {
             return msg && msg.toLowerCase().includes('u/wattpadbot');
         };
-    
-        const stream = new CommentStream(r, { subreddit: "all", results: 3 });
-    
-        stream.on("item", async (comment) => {
-            if(comment.created_utc > BOT_START && canSummon(comment.body))
-            {
-                logger.info(`new comment received : ${comment.body}`);
+        
+        //const stream = new CommentStream(r, { subreddit: "mytestingspacewpad", results: 3 });
 
-                const stories = getStoriesFromComment(comment.body);
-                const authors = getAuthorsFromComment(comment.body);
-                //response = getCommentData(comment.body);
-                const reply = await buildCommentReply(stories, authors);
+        r.config({ continueAfterRatelimitError: true });
 
-                logger.info(`Sending reply for comment: ${comment.body}, Reply: ${reply}`);
+        const inboxStream = new InboxStream(r, {filter: "inbox", limit:5, pollTime: 60000});
 
-                if (reply){
-                    comment.reply(reply);
-                }
-                else{
-                    logger.error(`No response found for comment : ${comment.body}`);
-                }
+        inboxStream.on("item", async (comment) => {
+            try{
+                if(comment.created_utc > BOT_START && canSummon(comment.body))
+                {
+                    logger.info(`new comment received : ${comment.body}`);
+
+                    const stories = getStoriesFromComment(comment.body);
+                    const authors = getAuthorsFromComment(comment.body);
+                    //response = getCommentData(comment.body);
+                    const reply = await buildCommentReply(stories, authors);
+
+                    logger.info(`Sending reply for comment: ${comment.body}, Reply: ${reply}`);
+
+                    if (reply){
+                        comment.reply(reply);
+                    }
+                    else{
+                        logger.error(`No response found for comment : ${comment.body}`);
+                    }
             }
-            });
+            //console.log(comment.body);
+            //inboxStream.end();
+            }
+            catch(ex){
+                logger.error(`Exception occured in inbox event : ${ex}`);
+            }
+        });
+
+        
+        //inboxStream.on("end", () => console.log("And now my watch has ended"));
+    
+        // stream.on("item", async (comment) => {
+        //     if(comment.created_utc > BOT_START && canSummon(comment.body))
+        //     {
+        //         logger.info(`new comment received : ${comment.body}`);
+
+        //         const stories = getStoriesFromComment(comment.body);
+        //         const authors = getAuthorsFromComment(comment.body);
+        //         //response = getCommentData(comment.body);
+        //         const reply = await buildCommentReply(stories, authors);
+
+        //         logger.info(`Sending reply for comment: ${comment.body}, Reply: ${reply}`);
+
+        //         if (reply){
+        //             comment.reply(reply);
+        //         }
+        //         else{
+        //             logger.error(`No response found for comment : ${comment.body}`);
+        //         }
+        //     }
+        //     });
 
         const getStoriesFromComment = (comment) => {
             const re= /{([\w-]+( [\w-]+)*)[ ]?}/gm;
